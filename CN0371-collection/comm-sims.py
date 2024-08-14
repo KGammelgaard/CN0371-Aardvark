@@ -1,9 +1,3 @@
-import aardvark_py
-"""
-port = aa.aa_find_devices(1)
-print(port[0])
-
-"""
 '''
 This script provides an example of how to use aardvark-py to run an aardvark as spi slave
 '''
@@ -102,7 +96,7 @@ else:
 aa_spi_bitrate(aardvark_handle, bitrate_khz)
 aa_spi_configure(aardvark_handle, polarity, phase, bitorder)
 
-# Enable as slave
+# disable as slave
 aa_spi_slave_disable(aardvark_handle)
 
 #
@@ -114,7 +108,10 @@ if status < 0:
     print(f"fail sending data ({aa_status_string(status)})")
 else:
     print("data [1, 2, 3, 4] sent on spi")
+print(data_in)
+
 
 ###############################################################################
 # CLEANUP
+print(type(aardvark_handle))
 aa_close(aardvark_handle)
