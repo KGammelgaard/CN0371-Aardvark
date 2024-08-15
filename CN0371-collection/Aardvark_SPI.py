@@ -7,7 +7,7 @@ from aardvark_py import *
 # Parameters
 AARDVARK_SERIAL_ID = 2238652585
 # -----------------
-bitrate_khz = 4000
+bitrate_khz = 500  # matches the clcock for 7192 clock speed adjusted for 2200 config
 # -----------------
 polarity = AA_SPI_POL_RISING_FALLING
 # polarity = AA_SPI_POL_FALLING_RISING
@@ -19,10 +19,10 @@ bitorder = AA_SPI_BITORDER_MSB
 # bitorder = AA_SPI_BITORDER_LSB
 # -----------------
 ss_polarity = AA_SPI_SS_ACTIVE_LOW
-
-
 # ss_polarity = AA_SPI_SS_ACTIVE_HIGH
-
+# -----------------
+target_power = AA_TARGET_POWER_BOTH  # enables pins providing power to the level shifter
+# target_power = AA_TARGET_POWER_NONE
 # -----------------------------------------------------------------------------
 
 
@@ -57,6 +57,7 @@ def aardvark_init():
     if aardvark_handle < 0:
         print(f"error opening aardvark '{aa_status_string(aardvark_handle)}'")
         sys.exit(1)
+    aa_target_power(aardvark_handle, target_power)
     return aardvark_handle
 
 
@@ -123,7 +124,9 @@ def CN0371_configure(aardvark_handle):
             print(f"fail sending data ({aa_status_string(status)})")
 
     # Configure 2200
+    aa_spi_bitrate(aardvark_handle, 100)
     status, data_in = aa_spi_write(aardvark_handle, array('B', [0x00, 0x00, 0x81]), array('B'))
+    aa_sleep_ms(1000) # wait for reset
     status, data_in = aa_spi_write(aardvark_handle, array('B', [0x00, 0x00, 0x00]), array('B'))
     status, data_in = aa_spi_write(aardvark_handle, array('B', [0x00, 0x28, 0x00]), array('B'))
     status, data_in = aa_spi_write(aardvark_handle, array('B', [0x00, 0x29, 0x2D]), array('B'))
@@ -153,13 +156,14 @@ def CN0371_configure(aardvark_handle):
     status, data_in = aa_spi_write(aardvark_handle, array('B', [0x00, 0x27, 0x00]), array('B'))
     status, data_in = aa_spi_write(aardvark_handle, array('B', [0x00, 0x10, 0x03]), array('B'))
     status, data_in = aa_spi_write(aardvark_handle, array('B', [0x00, 0x2A, 0x58]), array('B'))
+    aa_spi_bitrate(aardvark_handle, bitrate_khz)
 
 
 # testing methods
-handle = aardvark_init()
+"""handle = aardvark_init()
 spi_master_init(handle)
 CN0371_configure(handle)
-aa_close(handle)
+aa_close(handle)"""
 
 
 
